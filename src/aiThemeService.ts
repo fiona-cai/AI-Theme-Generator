@@ -96,8 +96,50 @@ export async function generateThemeFromPrompt(
 
     if (!workbench && !tokenColors) return null;
 
+    // Ensure some commonly-missed workbench keys exist (terminal, panel titles,
+    // and git decorations) so UI areas like the terminal and SCM headings get colored.
+    const ensured: Record<string, string> = { ...(workbench ?? {}) };
+
+    const get = (k: string) => ensured[k] ?? undefined;
+    const setIfMissing = (k: string, v?: string) => {
+      if (!get(k) && v) ensured[k] = v;
+    };
+
+    // Base fallbacks from editor colors
+    const editorBg = ensured["editor.background"] ?? undefined;
+    const editorFg = ensured["editor.foreground"] ?? undefined;
+    const accent = ensured["activityBar.background"] ?? ensured["button.background"] ?? undefined;
+
+    // Terminal
+    setIfMissing("terminal.background", editorBg);
+    setIfMissing("terminal.foreground", editorFg);
+
+    // Panel titles / sections
+    setIfMissing("panelTitle.activeForeground", ensured["sideBar.foreground"] ?? editorFg);
+    setIfMissing("panelTitle.activeBackground", ensured["sideBar.background"] ?? accent ?? editorBg);
+    setIfMissing("panelSectionHeader.background", ensured["sideBar.background"] ?? editorBg);
+    setIfMissing("panelSectionHeader.foreground", ensured["sideBar.foreground"] ?? editorFg);
+
+    // Git / SCM decorations (used for 'Changes' and graphs)
+    setIfMissing("gitDecoration.modifiedResourceForeground", ensured["list.activeSelectionForeground"] ?? editorFg);
+    setIfMissing("gitDecoration.addedResourceForeground", ensured["list.activeSelectionForeground"] ?? editorFg);
+
+    // If the user requested a light/medium/dark mode, we can nudge absent backgrounds
+    // toward sensible defaults. Only set these if completely missing.
+    if (mode === "dark") {
+      setIfMissing("editor.background", editorBg ?? "#0d1117");
+      setIfMissing("sideBar.background", ensured["sideBar.background"] ?? "#0b1220");
+    } else if (mode === "light") {
+      setIfMissing("editor.background", editorBg ?? "#fafafa");
+      setIfMissing("sideBar.background", ensured["sideBar.background"] ?? "#f4f9f4");
+    } else {
+      // medium
+      setIfMissing("editor.background", editorBg ?? "#2b2f3a");
+      setIfMissing("sideBar.background", ensured["sideBar.background"] ?? "#e7ecef");
+    }
+
     return {
-      workbench: workbench && Object.keys(workbench).length > 0 ? workbench : undefined,
+      workbench: Object.keys(ensured).length > 0 ? ensured : undefined,
       tokenColors:
         tokenColors && Object.keys(tokenColors).length > 0 ? tokenColors : undefined,
     };
