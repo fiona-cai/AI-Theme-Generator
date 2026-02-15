@@ -6,20 +6,6 @@ export function activate(context: vscode.ExtensionContext) {
   const disposable = vscode.commands.registerCommand(
     "palette-forge.generateTheme",
     async () => {
-      const mode = await vscode.window.showQuickPick(
-        [
-          { label: "Dark", description: "Deep/background-first themes" },
-          { label: "Medium", description: "Balanced contrast (semi-dark)" },
-          { label: "Light", description: "Light background themes" },
-        ],
-        { placeHolder: "Choose a base mode for the theme" }
-      );
-
-      if (!mode) {
-        // user cancelled
-        return;
-      }
-
       const prompt = await vscode.window.showInputBox({
         prompt: "Describe the theme you want (e.g. 'warm sunset with amber and deep purple', 'minimal nord dark')",
         placeHolder: "e.g. Ocean at dusk with teal and coral accents",
@@ -40,7 +26,7 @@ export function activate(context: vscode.ExtensionContext) {
         async (progress) => {
           progress.report({ message: "Generating theme with AI..." });
           try {
-            const theme = await generateThemeFromPrompt(prompt.trim(), mode.label.toLowerCase());
+            const theme = await generateThemeFromPrompt(prompt.trim());
             if (theme) {
               applyTheme(theme);
               progress.report({ message: "Applying theme..." });
