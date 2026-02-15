@@ -1,0 +1,52 @@
+{
+  "name": "palette-forge",
+  "displayName": "Palette Forge",
+  "description": "Generate and instantly apply custom VS Code themes from a text prompt using AI",
+  "version": "0.1.0",
+  "publisher": "palette-forge",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Themes",
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:palette-forge.generateTheme"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "palette-forge.generateTheme",
+        "title": "Palette Forge: Generate theme from prompt"
+      }
+    ],
+    "configuration": {
+      "title": "Palette Forge",
+      "properties": {
+        "paletteForge.openaiApiKey": {
+          "type": "string",
+          "default": "",
+          "description": "OpenAI API key for theme generation. Leave empty to use OPENAI_API_KEY from environment."
+        },
+        "paletteForge.model": {
+          "type": "string",
+          "default": "gpt-4o-mini",
+          "description": "OpenAI model to use for theme generation (e.g. gpt-4o-mini, gpt-4o)."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/vscode": "^1.85.0",
+    "typescript": "^5.3.0"
+  },
+  "dependencies": {}
+}
