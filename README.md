@@ -1,4 +1,4 @@
-# Palette Forge
+# AI Theme Generator
 
 Generate and instantly apply custom VS Code themes from a text prompt using AI.
 
