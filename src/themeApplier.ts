@@ -129,11 +129,11 @@ export function applyTheme(theme: GeneratedTheme): void {
 
   // Emit debug output to an output channel
   try {
-    const channel = vscode.window.createOutputChannel("Palette Forge");
+    const channel = vscode.window.createOutputChannel("AI Theme Generator");
     const finalWorkbench = config.get("workbench.colorCustomizations");
     const finalToken = config.get("editor.tokenColorCustomizations");
     
-    channel.appendLine("--- Palette Forge: Applied Theme ---");
+    channel.appendLine("--- AI Theme Generator: Applied Theme ---");
     channel.appendLine("--- Generated Workbench Colors ---");
     channel.appendLine(JSON.stringify(theme.workbench, null, 2));
     channel.appendLine("--- Generated Token Colors ---");
@@ -144,7 +144,7 @@ export function applyTheme(theme: GeneratedTheme): void {
     channel.show(true);
     
     vscode.window.showInformationMessage(
-      `Palette Forge: Theme applied! Added ${customCount} colors. Check Output panel for details.`
+      `AI Theme Generator: Theme applied! Added ${customCount} colors. Check Output panel for details.`
     );
   } catch (e) {
     // ignore output errors

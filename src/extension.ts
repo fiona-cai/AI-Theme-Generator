@@ -33,7 +33,7 @@ export function activate(context: vscode.ExtensionContext) {
       await vscode.window.withProgress(
         {
           location: vscode.ProgressLocation.Notification,
-          title: "Palette Forge",
+          title: "AI Theme Generator",
           cancellable: false,
         },
         async (progress) => {
@@ -44,10 +44,10 @@ export function activate(context: vscode.ExtensionContext) {
               applyTheme(theme);
               progress.report({ message: "Applying theme..." });
               vscode.window.showInformationMessage(
-                "Palette Forge: Theme applied! Check your editor and workbench."
+                "AI Theme Generator: Theme applied! Check your editor and workbench."
               );
             } else {
-              const channel = vscode.window.createOutputChannel("Palette Forge");
+              const channel = vscode.window.createOutputChannel("AI Theme Generator");
               channel.appendLine("ERROR: Could not parse API response as valid JSON");
               channel.appendLine("This usually means:");
               channel.appendLine("1. Your OpenAI API key is invalid or expired");
@@ -55,15 +55,15 @@ export function activate(context: vscode.ExtensionContext) {
               channel.appendLine("3. The API is having issues (check api.openai.com status)");
               channel.show();
               vscode.window.showErrorMessage(
-                "Palette Forge: Failed to generate valid theme. Check Output panel for details."
+                "AI Theme Generator: Failed to generate valid theme. Check Output panel for details."
               );
             }
           } catch (err) {
             const message = err instanceof Error ? err.message : String(err);
-            const channel = vscode.window.createOutputChannel("Palette Forge");
+            const channel = vscode.window.createOutputChannel("AI Theme Generator");
             channel.appendLine("ERROR: " + message);
             channel.show();
-            vscode.window.showErrorMessage(`Palette Forge: ${message}`);
+            vscode.window.showErrorMessage(`AI Theme Generator: ${message}`);
           }
         }
       );

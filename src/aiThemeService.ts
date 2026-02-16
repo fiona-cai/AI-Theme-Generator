@@ -211,16 +211,17 @@ Return this JSON structure:
   "tokenColors": { "type": "#hexcolor", ... }
 }
 
-Generate 50-80 workbench colors covering:
-- editor (background, foreground, selection, lineNumber, cursor, indentGuide)
-- activityBar, sideBar, titleBar, statusBar (background, foreground, border, accents)
-- tabs (active/inactive background, foreground, borders)
-- input, button (background, foreground, hover)
-- list (selection, hover backgrounds)
-- panel, notifications (background, borders, text)
-- terminal (foreground, background, all 16 ANSI colors: ansiRed, ansiBrightRed, etc.)
-- diff/gutter (addedBackground, modifiedBackground, deletedBackground)
-- scrollbar, widget, focusBorder
+Generate 60-80 workbench colors covering ALL of these categories:
+- editor colors: background, foreground, lineHighlightBackground, selectionBackground, selectionHighlightBackground, inactiveSelectionBackground, cursor foreground/background, whitespace, indentGuide (both active and inactive)
+- editor lines: editorLineNumber.foreground, editorLineNumber.activeForeground, editorLineNumber.activeBorderBackground
+- activity bar, sidebar, title bar, status bar (background, foreground, borders, accents)
+- tabs (active/inactive background, foreground, borders, modified indicators)
+- input fields, buttons, dropdowns (background, foreground, hover, focus states)
+- lists and trees (selection, hover, focus)
+- panels, notifications (background, borders, text, headers)
+- terminal (foreground, background, ANSI colors: ansiRed, ansiBrightRed, ansiGreen, ansiBrightGreen, ansiBlue, ansiBrightBlue, etc. - ALL 16 colors)
+- diff and git decorations (addedBackground, modifiedBackground, deletedBackground)
+- scrollbars, widgets, focus borders
 
 For tokenColors use: comments, strings, keywords, numbers, types, functions, variables.
 

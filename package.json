@@ -1,9 +1,9 @@
 {
-  "name": "palette-forge",
-  "displayName": "Palette Forge",
+  "name": "ai-theme-generator",
+  "displayName": "AI Theme Generator",
   "description": "Generate and instantly apply custom VS Code themes from a text prompt using AI",
   "version": "0.1.0",
-  "publisher": "palette-forge",
+  "publisher": "fiona-cai",
   "engines": {
     "vscode": "^1.85.0"
   },
@@ -19,11 +19,11 @@
     "commands": [
       {
         "command": "palette-forge.generateTheme",
-        "title": "Palette Forge: Generate theme from prompt"
+        "title": "AI Theme Generator: Generate theme from prompt"
       }
     ],
     "configuration": {
-      "title": "Palette Forge",
+      "title": "AI Theme Generator",
       "properties": {
         "paletteForge.openaiApiKey": {
           "type": "string",
