@@ -4,7 +4,7 @@ Generate and instantly apply custom VS Code themes from a text prompt using AI.
 
 ## How it works
 
-1. Run **Palette Forge: Generate theme from prompt** from the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`).
+1. Run **AI Theme Generator: Generate theme from prompt** from the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`).
 2. **Select a mode**: Choose between **Dark**, **Medium**, or **Light** to set the base brightness/contrast for the generated theme.
    - **Light**: Calibrated to VS Code's "Light (Visual Studio)" theme — professional, high-contrast colors for daytime use.
    - **Dark**: Deep, high-contrast backgrounds with saturated accents.
@@ -19,10 +19,10 @@ Generate and instantly apply custom VS Code themes from a text prompt using AI.
 ## Setup
 
 1. **OpenAI API key**  
-   - In VS Code: **Settings** → search for `Palette Forge` → set **OpenAI Api Key**, or  
+   - In VS Code: **Settings** → search for `AI Theme Generator` → set **OpenAI Api Key**, or  
    - Set the `OPENAI_API_KEY` environment variable.
 
-2. **(Optional)** Change the model in settings (`paletteForge.model`). Default is `gpt-4o-mini`; you can use `gpt-4o` for more creative themes.
+2. **(Optional)** Change the model in settings (`AI-Theme-Generator.model`). Default is `gpt-4o-mini`; you can use `gpt-4o` for more creative themes.
 
 ## What gets customized
 
@@ -61,7 +61,7 @@ Press **F5** in VS Code to open an Extension Development Host and try the comman
 
 ## Debug output
 
-After applying a theme, an output panel named **"Palette Forge"** opens showing:
+After applying a theme, an output panel named **"AI Theme Generator"** opens showing:
 - The generated theme name and file path.
 - The exact `workbench.colorCustomizations` and `editor.tokenColorCustomizations` applied.
 
