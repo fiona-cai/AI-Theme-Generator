@@ -169,22 +169,6 @@ Token colors: comments=#6A737D (muted gray), strings=#A5D6FF (light blue), keywo
 Keep dark mode high-contrast with saturated accents (#0078D4 blue, #FF7B72 red, etc.). Use these proven colors from Default Dark Modern as base for variations.
 `;
 
-const THEME_SYSTEM_PROMPT = `You are a VS Code theme designer. Given a short text description, you output a JSON object that can be used to customize the current theme.
-
-Output ONLY valid JSON, no markdown or explanation. The JSON must have exactly two top-level keys:
-1. "workbench" - object mapping workbench color IDs to hex colors (e.g. "#1e1e1e"). Include as many of these keys as possible: editor.background, editor.foreground, editor.lineHighlightBackground, editorLineNumber.foreground, activityBar.background, activityBar.foreground, sideBar.background, sideBar.foreground, sideBarTitle.foreground, sideBarSectionHeader.background, sideBarSectionHeader.foreground, titleBar.activeBackground, titleBar.activeForeground, statusBar.background, statusBar.foreground, statusBarItem.remoteBackground, statusBarItem.remoteForeground, tab.activeBackground, tab.activeForeground, tab.inactiveBackground, tab.inactiveForeground, tab.selectedBorderTop, list.activeSelectionBackground, list.activeSelectionForeground, list.hoverBackground, input.background, input.foreground, input.border, button.background, button.foreground, button.hoverBackground, focusBorder, scrollbarSlider.background, scrollbarSlider.hoverBackground, terminal.background, terminal.foreground, terminal.tab.activeBorder, panelTitle.activeForeground, panelTitle.inactiveForeground, panelSectionHeader.background, panelSectionHeader.foreground, editorGutter.addedBackground, editorGutter.modifiedBackground, editorGutter.deletedBackground, notificationCenterHeader.background, panel.background, panel.border, widget.border.
-2. "tokenColors" - object for editor.tokenColorCustomizations. Use only these keys (string values, hex colors): comments, strings, keywords, numbers, types, functions, variables. You can also use "textMateRules" as an array but prefer the simple keys when possible.
-
-Support three base modes: "dark", "medium", and "light".
-
-For "dark" mode: ${DARK_THEME_REFERENCE} Generate dark, professional themes with high contrast for low-light environments.
-
-For "light" mode: ${LIGHT_THEME_REFERENCE} Generate light, professional themes suitable for daytime use.
-
-For "medium" mode: Use balanced mid-tone backgrounds (e.g. #2b2f3a, #e7ecef) with medium contrast. Good for people who want something between light and dark.
-
-All color values must be valid hex: #RGB or #RRGGBB. Generate a cohesive palette (10-30 workbench entries, 5-7 token entries) that matches the user's description and adheres strictly to the requested mode. Use consistent saturation and contrast across all colors.`;
-
 function getApiKey(): string {
   const config = vscode.workspace.getConfiguration("paletteForge");
   const key = config.get<string>("openaiApiKey", "");
@@ -208,18 +192,55 @@ export async function generateThemeFromPrompt(
     );
   }
 
+  // Select the appropriate theme reference based on mode
+  let themeReference = "";
+  if (mode === "light") {
+    themeReference = LIGHT_THEME_REFERENCE;
+  } else if (mode === "medium") {
+    themeReference = `Medium mode should use balanced mid-tone backgrounds (e.g., #2b2f3a for backgrounds, #e7ecef for light areas) with medium contrast. This is suitable for people who want something between light and dark. Mix the principles from both light and dark modes.`;
+  } else {
+    themeReference = DARK_THEME_REFERENCE;
+  }
+
+  // Build the system prompt with only the relevant theme reference
+  const systemPrompt = `You are a VS Code theme designer. Output ONLY valid JSON with NO explanation or markdown.
+
+Return this JSON structure:
+{
+  "workbench": { "color.id": "#hexcolor", ... },
+  "tokenColors": { "type": "#hexcolor", ... }
+}
+
+Generate 50-80 workbench colors covering:
+- editor (background, foreground, selection, lineNumber, cursor, indentGuide)
+- activityBar, sideBar, titleBar, statusBar (background, foreground, border, accents)
+- tabs (active/inactive background, foreground, borders)
+- input, button (background, foreground, hover)
+- list (selection, hover backgrounds)
+- panel, notifications (background, borders, text)
+- terminal (foreground, background, all 16 ANSI colors: ansiRed, ansiBrightRed, etc.)
+- diff/gutter (addedBackground, modifiedBackground, deletedBackground)
+- scrollbar, widget, focusBorder
+
+For tokenColors use: comments, strings, keywords, numbers, types, functions, variables.
+
+Mode: "${mode}"
+${themeReference}
+
+All hex colors must be valid (#RGB or #RRGGBB). Match user description and mode strictly. Generate a cohesive palette.`;
+
   const model = getModel();
   const body = {
     model,
     messages: [
-      { role: "system", content: THEME_SYSTEM_PROMPT },
+      { role: "system", content: systemPrompt },
       {
         role: "user",
-        content: `Generate a VS Code theme for: "${userPrompt}"\nMode: ${mode}. Use ONLY ${mode} mode rules for backgrounds, contrast, and all colors. Ensure this is a cohesive ${mode}-mode palette.`,
+        content: `Generate a VS Code theme for: "${userPrompt}". Output ONLY JSON.`,
       },
     ],
     temperature: 0.7,
-    max_tokens: 1500,
+    max_tokens: 3000,
   };
 
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -256,6 +277,7 @@ export async function generateThemeFromPrompt(
       typeof parsed !== "object" ||
       Array.isArray(parsed)
     ) {
+      console.error("Invalid JSON structure:", raw.substring(0, 200));
       return null;
     }
     const obj = parsed as Record<string, unknown>;
@@ -268,14 +290,19 @@ export async function generateThemeFromPrompt(
         ? (obj.tokenColors as Record<string, string>)
         : undefined;
 
-    if (!workbench && !tokenColors) return null;
+    if (!workbench && !tokenColors) {
+      console.error("No workbench or tokenColors in response:", raw.substring(0, 200));
+      return null;
+    }
 
     return {
       workbench: workbench && Object.keys(workbench).length > 0 ? workbench : undefined,
       tokenColors:
         tokenColors && Object.keys(tokenColors).length > 0 ? tokenColors : undefined,
     };
-  } catch {
+  } catch (e) {
+    console.error("JSON parse error:", e instanceof Error ? e.message : String(e));
+    console.error("Raw response:", raw.substring(0, 300));
     return null;
   }
 }

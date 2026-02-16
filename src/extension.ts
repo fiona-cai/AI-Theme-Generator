@@ -47,12 +47,22 @@ export function activate(context: vscode.ExtensionContext) {
                 "Palette Forge: Theme applied! Check your editor and workbench."
               );
             } else {
+              const channel = vscode.window.createOutputChannel("Palette Forge");
+              channel.appendLine("ERROR: Could not parse API response as valid JSON");
+              channel.appendLine("This usually means:");
+              channel.appendLine("1. Your OpenAI API key is invalid or expired");
+              channel.appendLine("2. Your API account doesn't have sufficient credits");
+              channel.appendLine("3. The API is having issues (check api.openai.com status)");
+              channel.show();
               vscode.window.showErrorMessage(
-                "Palette Forge: Could not generate a valid theme. Check your API key and try again."
+                "Palette Forge: Failed to generate valid theme. Check Output panel for details."
               );
             }
           } catch (err) {
             const message = err instanceof Error ? err.message : String(err);
+            const channel = vscode.window.createOutputChannel("Palette Forge");
+            channel.appendLine("ERROR: " + message);
+            channel.show();
             vscode.window.showErrorMessage(`Palette Forge: ${message}`);
           }
         }

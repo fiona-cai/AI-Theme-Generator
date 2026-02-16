@@ -9,110 +9,33 @@ export interface GeneratedTheme {
 
 /**
  * Apply generated theme by:
- * 1. Creating a complete VS Code theme file and registering it
- * 2. Updating workbench.colorCustomizations and editor.tokenColorCustomizations
- * 3. Setting workbench.colorTheme to use the generated theme
+ * 1. Updating workbench.colorCustomizations with all workbench colors
+ * 2. Updating editor.tokenColorCustomizations with token colors
+ * 3. Updating editor.semanticTokenColorCustomizations for semantic highlighting
+ * 
+ * Note: We apply to the CURRENT theme (not trying to set a custom theme name)
+ * so colors work regardless of which base theme is active.
  */
 export function applyTheme(theme: GeneratedTheme): void {
   const config = vscode.workspace.getConfiguration();
 
-  // Generate a unique theme name based on timestamp
-  const timestamp = Date.now();
-  const themeName = `Palette Forge ${timestamp}`;
-  
-  // Use VS Code's extensions directory to store the theme
-  // This makes the theme discoverable by VS Code
-  const homeDir = process.env.HOME || process.env.USERPROFILE || "/tmp";
-  const extensionsDir = path.join(homeDir, ".vscode", "extensions");
-  const paletteForgeExtDir = path.join(extensionsDir, "palette-forge-generated");
-  const themeFilePath = path.join(paletteForgeExtDir, "theme.json");
+  // Apply workbench color customizations at GLOBAL LEVEL ONLY
+  // (not per-theme) so colors apply to any active theme
+  if (theme.workbench && Object.keys(theme.workbench).length > 0) {
+    const existing =
+      (config.get<Record<string, unknown>>("workbench.colorCustomizations") as
+        | Record<string, unknown>
+        | undefined) ?? {};
 
-  // Build the complete theme JSON object
-  const themeJson: Record<string, unknown> = {
-    name: themeName,
-    type: "light", // will be overridden by colors
-    colors: theme.workbench ?? {},
-    tokenColors: theme.tokenColors
-      ? [
-          {
-            scope: ["comment"],
-            settings: { foreground: theme.tokenColors.comments },
-          },
-          {
-            scope: ["string"],
-            settings: { foreground: theme.tokenColors.strings },
-          },
-          {
-            scope: ["keyword"],
-            settings: { foreground: theme.tokenColors.keywords },
-          },
-          {
-            scope: ["constant.numeric"],
-            settings: { foreground: theme.tokenColors.numbers },
-          },
-          {
-            scope: ["entity.name.type"],
-            settings: { foreground: theme.tokenColors.types },
-          },
-          {
-            scope: ["entity.name.function"],
-            settings: { foreground: theme.tokenColors.functions },
-          },
-          {
-            scope: ["variable"],
-            settings: { foreground: theme.tokenColors.variables },
-          },
-        ].filter((rule) => rule.settings.foreground !== undefined)
-      : [],
-  };
+    // Merge colors at global level only - this ensures they work with any theme
+    const merged = { ...(existing as Record<string, unknown>), ...theme.workbench };
 
-  try {
-    // Create extensions/palette-forge-generated directory if it doesn't exist
-    if (!fs.existsSync(paletteForgeExtDir)) {
-      fs.mkdirSync(paletteForgeExtDir, { recursive: true });
-    }
-
-    // Write theme file
-    fs.writeFileSync(themeFilePath, JSON.stringify(themeJson, null, 2), "utf8");
-
-    // Update workbench.colorTheme to the generated theme
-    // This is the key setting that switches the active theme
     config.update(
-      "workbench.colorTheme",
-      themeName,
+      "workbench.colorCustomizations",
+      merged,
       vscode.ConfigurationTarget.Global
     );
-
-    // Also write customizations for overlay/refinement if needed
-    if (theme.workbench && Object.keys(theme.workbench).length > 0) {
-      const existing =
-        (config.get<Record<string, unknown>>("workbench.colorCustomizations") as
-          | Record<string, unknown>
-          | undefined) ?? {};
-
-      const activeTheme =
-        vscode.workspace.getConfiguration("workbench").get<string>(
-          "colorTheme",
-          ""
-        ) || "";
-      const themeKey = activeTheme ? `[${activeTheme}]` : "";
-
-      const mergedTop = { ...(existing as Record<string, unknown>), ...theme.workbench };
-
-      if (themeKey) {
-        const existingPer =
-          existing && typeof existing[themeKey] === "object"
-            ? (existing[themeKey] as Record<string, unknown>)
-            : {};
-        mergedTop[themeKey] = { ...(existingPer ?? {}), ...theme.workbench };
-      }
-
-      config.update(
-        "workbench.colorCustomizations",
-        mergedTop,
-        vscode.ConfigurationTarget.Global
-      );
-    }
+  }
 
     if (theme.tokenColors && Object.keys(theme.tokenColors).length > 0) {
       const existing =
@@ -204,28 +127,26 @@ export function applyTheme(theme: GeneratedTheme): void {
       }
     }
 
-    // Emit debug output to an output channel
-    try {
-      const channel = vscode.window.createOutputChannel("Palette Forge");
-      const finalWorkbench = config.get("workbench.colorCustomizations");
-      const finalToken = config.get("editor.tokenColorCustomizations");
-      const activeTheme = config.get("workbench.colorTheme");
-      
-      channel.appendLine("--- Palette Forge: Applied Theme ---");
-      channel.appendLine(`Theme Name: ${themeName}`);
-      channel.appendLine(`Theme File: ${themeFilePath}`);
-      channel.appendLine(`Active Theme Setting (workbench.colorTheme): ${activeTheme}`);
-      channel.appendLine("--- workbench.colorCustomizations ---");
-      channel.appendLine(JSON.stringify(finalWorkbench, null, 2));
-      channel.appendLine("--- editor.tokenColorCustomizations ---");
-      channel.appendLine(JSON.stringify(finalToken, null, 2));
-      channel.show(true);
-    } catch (e) {
-      // ignore
-    }
-  } catch (err) {
-    vscode.window.showErrorMessage(
-      `Palette Forge: Failed to write theme file. ${err instanceof Error ? err.message : String(err)}`
+  // Emit debug output to an output channel
+  try {
+    const channel = vscode.window.createOutputChannel("Palette Forge");
+    const finalWorkbench = config.get("workbench.colorCustomizations");
+    const finalToken = config.get("editor.tokenColorCustomizations");
+    
+    channel.appendLine("--- Palette Forge: Applied Theme ---");
+    channel.appendLine("--- Generated Workbench Colors ---");
+    channel.appendLine(JSON.stringify(theme.workbench, null, 2));
+    channel.appendLine("--- Generated Token Colors ---");
+    channel.appendLine(JSON.stringify(theme.tokenColors, null, 2));
+    channel.appendLine("--- Total colors in workbench.colorCustomizations ---");
+    const customCount = theme.workbench ? Object.keys(theme.workbench).length : 0;
+    channel.appendLine(`Added ${customCount} workbench color customizations`);
+    channel.show(true);
+    
+    vscode.window.showInformationMessage(
+      `Palette Forge: Theme applied! Added ${customCount} colors. Check Output panel for details.`
     );
+  } catch (e) {
+    // ignore output errors
   }
 }
