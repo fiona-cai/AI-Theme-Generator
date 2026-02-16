@@ -218,7 +218,7 @@ Generate 60-80 workbench colors covering ALL of these categories:
 - tabs (active/inactive background, foreground, borders, modified indicators)
 - input fields, buttons, dropdowns (background, foreground, hover, focus states)
 - lists and trees (selection, hover, focus)
-- panels, notifications (background, borders, text, headers)
+- panels and notifications (background, borders, text, headers, panelTitle.activeBackground, panelTitle.activeForeground, panelTitle.inactiveForeground, panelSectionHeader colors, etc.)
 - terminal (foreground, background, ANSI colors: ansiRed, ansiBrightRed, ansiGreen, ansiBrightGreen, ansiBlue, ansiBrightBlue, etc. - ALL 16 colors)
 - diff and git decorations (addedBackground, modifiedBackground, deletedBackground)
 - scrollbars, widgets, focus borders
