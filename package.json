@@ -2,7 +2,7 @@
   "name": "ai-theme-generator",
   "displayName": "AI Theme Generator",
   "description": "Generate and instantly apply custom, professional VS Code themes from a simple text prompt using AI.",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "publisher": "fcaiona",
   "icon": "icon.png",
   "repository": {
