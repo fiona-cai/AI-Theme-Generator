@@ -1,10 +1,14 @@
 {
   "name": "ai-theme-generator",
   "displayName": "AI Theme Generator",
-  "description": "Generate and instantly apply custom VS Code themes from a text prompt using AI",
-  "version": "0.1.0",
+  "description": "Generate and instantly apply custom, professional VS Code themes from a simple text prompt using AI.",
+  "version": "0.1.2",
   "publisher": "fcaiona",
   "icon": "icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fiona-cai/PaletteForge.git"
+  },
   "engines": {
     "vscode": "^1.85.0"
   },
@@ -20,7 +24,7 @@
     "commands": [
       {
         "command": "palette-forge.generateTheme",
-        "title": "AI Theme Generator: Generate theme from prompt"
+        "title": "AI Theme Generator: Create theme from prompt"
       }
     ],
     "configuration": {
@@ -29,7 +33,7 @@
         "paletteForge.openaiApiKey": {
           "type": "string",
           "default": "",
-          "description": "OpenAI API key for theme generation. Leave empty to use OPENAI_API_KEY from environment."
+          "description": "OpenAI API key for AI Theme Generator. Leave empty to use OPENAI_API_KEY from environment."
         },
         "paletteForge.model": {
           "type": "string",

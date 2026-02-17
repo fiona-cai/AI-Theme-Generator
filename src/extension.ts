@@ -8,11 +8,11 @@ export function activate(context: vscode.ExtensionContext) {
     async () => {
       const mode = await vscode.window.showQuickPick(
         [
-          { label: "Dark", description: "Deep/background-first themes" },
-          { label: "Medium", description: "Balanced contrast (semi-dark)" },
-          { label: "Light", description: "Light background themes" },
+          { label: "Dark", description: "Deep, high-contrast themes" },
+          { label: "Medium", description: "Balanced, semi-dark themes" },
+          { label: "Light", description: "Bright, light background themes" },
         ],
-        { placeHolder: "Choose a base mode for the theme" }
+        { placeHolder: "Choose a base mode for your AI-generated theme" }
       );
 
       if (!mode) {
