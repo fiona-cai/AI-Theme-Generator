@@ -3,7 +3,8 @@
   "displayName": "AI Theme Generator",
   "description": "Generate and instantly apply custom VS Code themes from a text prompt using AI",
   "version": "0.1.0",
-  "publisher": "fiona-cai",
+  "publisher": "fcaiona",
+  "icon": "icon.png",
   "engines": {
     "vscode": "^1.85.0"
   },
